@@ -14,11 +14,7 @@ public class GameTile : MonoBehaviour
 
     public bool IsAlternative { get; set; }
 
-    public enum GameTileContentType
-    {
-        Empty, Destination
-    }
-
+  
     // For Arrow Rotations
     static Quaternion
         northRotation = Quaternion.Euler(90f, 0f, 0f),

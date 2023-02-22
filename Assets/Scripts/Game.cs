@@ -10,6 +10,7 @@ public class Game : MonoBehaviour
     [SerializeField]
     GameBoard board = default;
 
+    [SerializeField] GameTileContentFactory tileContentFactory = default;
 
     private void OnValidate()
     {

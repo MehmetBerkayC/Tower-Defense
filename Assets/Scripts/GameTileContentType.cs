@@ -1,10 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class GameTileContentType : MonoBehaviour
+public enum GameTileContentType
 {
-    [SerializeField] GameTileContentType type = default;
-
-    public GameTileContentType Type => type;
+    Empty, Destination
 }
+

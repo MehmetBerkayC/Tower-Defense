@@ -105,4 +105,16 @@ public class GameBoard : MonoBehaviour
             tile.ShowPath();
         }
     }
+
+    // Getting the tile player clicked
+    public GameTile GetTile(Ray ray)
+    {
+        if (Physics.Raycast(ray))
+        {
+            return null;
+        }
+
+        return null;
+    }
+
 }
