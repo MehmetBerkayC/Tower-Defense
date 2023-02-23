@@ -14,7 +14,24 @@ public class GameTile : MonoBehaviour
 
     public bool IsAlternative { get; set; }
 
+    // Content of the tile
+    GameTileContent content;
   
+    public GameTileContent Content
+    {
+        get => content;
+        set
+        {
+            Debug.Assert(value != null, "Null assigned to content!"); // Debug.Assert Displays Msg if condition false
+            if(content != null)
+            {
+                content.Recycle();
+            }
+            content = value;
+            content.transform.localPosition = transform.localPosition;
+        }
+    }
+
     // For Arrow Rotations
     static Quaternion
         northRotation = Quaternion.Euler(90f, 0f, 0f),
