@@ -39,21 +39,7 @@ public class GameTile : MonoBehaviour
         soutnRotation = Quaternion.Euler(90f, 180f, 0f),
         westRotation = Quaternion.Euler(90f, 270f, 0f);
 
-    public void ShowPath() // Display Pathing by rotating arrows
-    {
-        if(distance == 0)
-        {
-            arrow.gameObject.SetActive(false);
-            return;
-        }
 
-        arrow.gameObject.SetActive(true);
-        arrow.localRotation =
-            nextOnPath == north ? northRotation :
-            nextOnPath == east ? eastRotation :
-            nextOnPath == south ? soutnRotation :
-            westRotation;
-    }
 
     // Pathing 
     public GameTile GrowPathToNorth() => GrowPathTo(north);
@@ -65,16 +51,16 @@ public class GameTile : MonoBehaviour
     {
         Debug.Assert(HasPath, "No Path!");
 
-        // if tile doesn't have a neighbor or already had pathing
-        if(neighbor == null || neighbor.HasPath)
+        // if tile has pathing, doesn't have a neighbor or neighbor already had pathing
+        if(!HasPath || neighbor == null || neighbor.HasPath)
         {
-            return null;
+            return null; // do nothing
         }
 
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
 
-        return neighbor;
+        return neighbor.content.Type != GameTileContentType.Wall ? neighbor : null;
     }
 
     // Defining neighbor tiles
@@ -103,5 +89,26 @@ public class GameTile : MonoBehaviour
     {
         distance = 0;
         nextOnPath = null;
+    }
+
+    public void ShowPath() // Display Pathing by rotating arrows
+    {
+        if (distance == 0)
+        {
+            arrow.gameObject.SetActive(false);
+            return;
+        }
+
+        arrow.gameObject.SetActive(true);
+        arrow.localRotation =
+            nextOnPath == north ? northRotation :
+            nextOnPath == east ? eastRotation :
+            nextOnPath == south ? soutnRotation :
+            westRotation;
+    }
+
+    public void HidePath()
+    {
+        arrow.gameObject.SetActive(false);
     }
 }

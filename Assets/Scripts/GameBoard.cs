@@ -17,9 +17,38 @@ public class GameBoard : MonoBehaviour
 
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
-    public void Initialize(Vector2Int size)
+    GameTileContentFactory contentFactory;
+
+    bool showPaths;
+
+    public bool ShowPaths
+    {
+        get => showPaths;
+        set
+        {
+            showPaths = value;
+            if (showPaths)
+            {
+                foreach (GameTile tile in tiles)
+                {
+                    tile.ShowPath();
+                }
+            }
+            else
+            {
+                foreach (GameTile tile in tiles)
+                {
+                    tile.HidePath();
+                }
+            }
+        }
+    }
+
+
+    public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
         this.size = size;
+        this.contentFactory = contentFactory;
         ground.localScale = new Vector3(size.x, size.y, 1f);
 
         Vector2 offset = new Vector2((size.x - 1) * 0.5f, (size.y - 1) * 0.5f);
@@ -56,27 +85,80 @@ public class GameBoard : MonoBehaviour
                     // revert changes
                     tile.IsAlternative = !tile.IsAlternative;
                 } // This will make a checkerboard design
+
+                // Assign every tile as empty
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
             }
         }
 
-        // Make one tile the exit point and use pathfinding
-        FindPaths();
+        // Make an exit and find a path
+        ToggleDestination(tiles[tiles.Length / 2]);
     }
 
-    private void FindPaths()
+    public void ToggleDestination(GameTile tile)
     {
-        // Clear each tile's pathing
-        foreach (GameTile tile in tiles)
+        // Adding a destination can never result in a valid board state, but removing a destination can.
+        if (tile.Content.Type == GameTileContentType.Destination)
         {
-            tile.ClearPath();
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            if (!FindPaths()) // When findpaths returns false - invalid board - no destination
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Destination);
+                FindPaths();
+            }
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Destination);
+            FindPaths();
         }
 
-        // Make an Exit tile
-        tiles[tiles.Length / 2].BecomeDestination();
-        
-        // Breadth-First Search
-        searchFrontier.Enqueue(tiles[tiles.Length / 2]);
+    }
 
+    public void ToggleWall(GameTile tile)
+    {
+        // Walls will only get switched with empty tiles 
+        if(tile.Content.Type == GameTileContentType.Wall)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            FindPaths();
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Wall);
+            if (!FindPaths()) // Don't allow walls on destination tiles
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                FindPaths();
+            }
+        }
+    }
+
+    private bool FindPaths()
+    {
+        // Each tile's pathing
+        foreach (GameTile tile in tiles)
+        {
+            // Make it an Exit tile 
+            if (tile.Content.Type == GameTileContentType.Destination)
+            {
+                tile.BecomeDestination();
+                // Add to Search Frontiers 
+                searchFrontier.Enqueue(tile);
+            }
+            else
+            {
+                tile.ClearPath();
+            }
+        }
+        
+        // If there isn't any destination tiles
+        if(searchFrontier.Count == 0)
+        {
+            return false;
+        }
+
+        // Breadth-First Search
         while(searchFrontier.Count > 0)
         {
             GameTile tile = searchFrontier.Dequeue();
@@ -99,11 +181,26 @@ public class GameBoard : MonoBehaviour
             }
         }
 
-        // Display pathing
+        // Check for any invalid path
         foreach (GameTile tile in tiles)
         {
-            tile.ShowPath();
+            if (!tile.HasPath)
+            {
+                return false;
+            }
         }
+
+        if (showPaths)
+        {
+            // Display pathing
+            foreach (GameTile tile in tiles)
+            {
+                tile.ShowPath();
+            }
+        }
+      
+
+        return true;
     }
 
     // Getting the tile player clicked
@@ -113,7 +210,7 @@ public class GameBoard : MonoBehaviour
         {
             int x = (int)(hit.point.x + size.x * 0.5f);
             int y = (int)(hit.point.z + size.y * 0.5f);
-            if(x >= 0 && x < size.x && y >= 0 && y < size.y)
+            if (x >= 0 && x < size.x && y >= 0 && y < size.y)
             {
                 return tiles[x + y * size.x];
             }
