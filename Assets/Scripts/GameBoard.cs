@@ -22,6 +22,8 @@ public class GameBoard : MonoBehaviour
     [SerializeField] 
     Texture2D gridTexture = default;
 
+    List<GameTile> spawnPoints = new List<GameTile>();
+
 
     bool showGrid, showPaths;
 
@@ -113,8 +115,11 @@ public class GameBoard : MonoBehaviour
             }
         }
 
-        // Make an exit and find a path
+        // Make an exit for a valid board
         ToggleDestination(tiles[tiles.Length / 2]);
+
+        // Make a spawn point for a valid board
+        ToggleSpawnPoint(tiles[0]);
     }
 
     public void ToggleDestination(GameTile tile)
@@ -133,6 +138,24 @@ public class GameBoard : MonoBehaviour
         {
             tile.Content = contentFactory.Get(GameTileContentType.Destination);
             FindPaths();
+        }
+
+    }  
+    
+    public void ToggleSpawnPoint(GameTile tile)
+    {
+        if (tile.Content.Type == GameTileContentType.SpawnPoint)
+        {
+            if(spawnPoints.Count > 1)
+            {
+                spawnPoints.Remove(tile);
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            }
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
+            spawnPoints.Add(tile);
         }
 
     }
@@ -223,6 +246,13 @@ public class GameBoard : MonoBehaviour
       
 
         return true;
+    }
+
+    public int SpawnPointCount => spawnPoints.Count;
+
+    public GameTile GetSpawnPoint (int index)
+    {
+        return spawnPoints[index];
     }
 
     // Getting the tile player clicked

@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 01ae5c8f1f4108740b107be056b03f6c, type: 3}
-  m_Name: New Game Tile Content Factory
+  m_Name: GameTile Content Factory
   m_EditorClassIdentifier: 
   destinationPrefab: {fileID: 9126797894860818144, guid: 4a5f1af867f66c344829fafb0a95684f, type: 3}
   emptyPrefab: {fileID: 4829013377056267908, guid: 30ea9d971b7e6bc45bba11525310091f, type: 3}
   wallPrefab: {fileID: 2794730011174657601, guid: a442216e5a20c574cb57cb1da10e4dce, type: 3}
+  spawnPointPrefab: {fileID: 2005645666775362796, guid: 56d54349243fc5c4bb85959f4ee51dd7, type: 3}

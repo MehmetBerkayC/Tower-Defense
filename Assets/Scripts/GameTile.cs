@@ -14,6 +14,7 @@ public class GameTile : MonoBehaviour
 
     public bool IsAlternative { get; set; }
 
+
     // Content of the tile
     GameTileContent content;
   
@@ -42,6 +43,8 @@ public class GameTile : MonoBehaviour
 
 
     // Pathing 
+
+    public GameTile NextTileOnPath => nextOnPath;
     public GameTile GrowPathToNorth() => GrowPathTo(north);
     public GameTile GrowPathToEast() => GrowPathTo(east);
     public GameTile GrowPathToSouth() => GrowPathTo(south);
