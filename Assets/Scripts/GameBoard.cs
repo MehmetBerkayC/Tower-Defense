@@ -19,8 +19,30 @@ public class GameBoard : MonoBehaviour
 
     GameTileContentFactory contentFactory;
 
-    bool showPaths;
+    [SerializeField] 
+    Texture2D gridTexture = default;
 
+
+    bool showGrid, showPaths;
+
+    public bool ShowGrid
+    {
+        get => showGrid;
+        set
+        {
+            showGrid = value;
+            Material m = ground.GetComponent<MeshRenderer>().material;
+            if (showGrid)
+            {
+                m.mainTexture = gridTexture;
+                m.SetTextureScale("_MainTex", size);
+            }
+            else
+            {
+                m.mainTexture = null;
+            }
+        }
+    }
     public bool ShowPaths
     {
         get => showPaths;
