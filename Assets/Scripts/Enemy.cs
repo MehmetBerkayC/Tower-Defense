@@ -50,7 +50,7 @@ public class Enemy : MonoBehaviour
             progress -= 1f;
         }
 
-        transform.localPosition += Vector3.LerpUnclamped(positionFrom, positionTo, progress);
+        transform.localPosition = Vector3.LerpUnclamped(positionFrom, positionTo, progress);
         return true;
     }
 }
