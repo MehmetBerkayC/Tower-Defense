@@ -10,10 +10,14 @@ public class GameTile : MonoBehaviour
     GameTile north, east, south, west, nextOnPath;
     int distance;
 
+    public Direction PathDirection { get; private set; }
+
     public bool HasPath => distance != int.MaxValue;
 
     public bool IsAlternative { get; set; }
 
+    // Edge between 2 tiles
+    public Vector3 ExitPoint { get; private set; }
 
     // Content of the tile
     GameTileContent content;
@@ -41,16 +45,14 @@ public class GameTile : MonoBehaviour
         westRotation = Quaternion.Euler(90f, 270f, 0f);
 
 
-
     // Pathing 
-
     public GameTile NextTileOnPath => nextOnPath;
-    public GameTile GrowPathToNorth() => GrowPathTo(north);
-    public GameTile GrowPathToEast() => GrowPathTo(east);
-    public GameTile GrowPathToSouth() => GrowPathTo(south);
-    public GameTile GrowPathToWest() => GrowPathTo(west);
+    public GameTile GrowPathToNorth() => GrowPathTo(north, Direction.South);
+    public GameTile GrowPathToEast() => GrowPathTo(east, Direction.West);
+    public GameTile GrowPathToSouth() => GrowPathTo(south, Direction.North);
+    public GameTile GrowPathToWest() => GrowPathTo(west, Direction.East);
 
-    private GameTile GrowPathTo(GameTile neighbor)
+    private GameTile GrowPathTo(GameTile neighbor, Direction direction)
     {
         Debug.Assert(HasPath, "No Path!");
 
@@ -62,6 +64,10 @@ public class GameTile : MonoBehaviour
 
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
+
+        neighbor.ExitPoint = neighbor.transform.localPosition + direction.GetHalfVector();
+
+        neighbor.PathDirection = direction; // Direction to the next tile
 
         return neighbor.content.Type != GameTileContentType.Wall ? neighbor : null;
     }
@@ -92,6 +98,7 @@ public class GameTile : MonoBehaviour
     {
         distance = 0;
         nextOnPath = null;
+        ExitPoint = transform.localPosition;
     }
 
     public void ShowPath() // Display Pathing by rotating arrows
