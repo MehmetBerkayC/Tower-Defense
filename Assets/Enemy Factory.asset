@@ -16,3 +16,9 @@ MonoBehaviour:
   scale:
     min: 0.5
     max: 1.25
+  pathOffset:
+    min: -0.4
+    max: 0.4
+  speed:
+    min: 1
+    max: 2

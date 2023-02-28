@@ -24,6 +24,7 @@ public class GameBoard : MonoBehaviour
 
     List<GameTile> spawnPoints = new List<GameTile>();
 
+    List<GameTileContent> updatingContent = new List<GameTileContent>();
 
     bool showGrid, showPaths;
 
@@ -68,6 +69,13 @@ public class GameBoard : MonoBehaviour
         }
     }
 
+    public void GameUpdate()
+    {
+        for(int i = 0; i < updatingContent.Count; i++)
+        {
+            updatingContent[i].GameUpdate();
+        }
+    }
 
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
@@ -178,6 +186,35 @@ public class GameBoard : MonoBehaviour
             }
         }
     }
+    
+    public void ToggleTower(GameTile tile)
+    {
+        // Walls will only get switched with empty tiles 
+        if(tile.Content.Type == GameTileContentType.Tower)
+        {
+            updatingContent.Remove(tile.Content);
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            FindPaths();
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Tower);
+            if (FindPaths()) // if valid board, add tile to list
+            {
+                updatingContent.Add(tile.Content);
+            } 
+            else // Don't allow walls on destination tiles
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                FindPaths();
+            }
+        }
+        else if (tile.Content.Type == GameTileContentType.Wall) // Replace wall with tower if wall is present
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Tower);
+            updatingContent.Add(tile.Content);
+        }
+    }
 
     private bool FindPaths()
     {
@@ -258,7 +295,7 @@ public class GameBoard : MonoBehaviour
     // Getting the tile player clicked
     public GameTile GetTile(Ray ray)
     {
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, 1))
         {
             int x = (int)(hit.point.x + size.x * 0.5f);
             int y = (int)(hit.point.z + size.y * 0.5f);

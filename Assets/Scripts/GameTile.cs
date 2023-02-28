@@ -69,7 +69,7 @@ public class GameTile : MonoBehaviour
 
         neighbor.PathDirection = direction; // Direction to the next tile
 
-        return neighbor.content.Type != GameTileContentType.Wall ? neighbor : null;
+        return neighbor.Content.BlocksPath ? null: neighbor; // return null if blocking path
     }
 
     // Defining neighbor tiles
