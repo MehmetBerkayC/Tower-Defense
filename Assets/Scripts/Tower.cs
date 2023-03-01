@@ -3,59 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tower : GameTileContent
+public abstract class Tower : GameTileContent
 {
-    [SerializeField, Range(1.5f, 10.5f)] float targetingRange = 1.5f;
-
-    TargetPoint target;
+    [SerializeField, Range(1.5f, 10.5f)]
+    protected float targetingRange = 1.5f;
 
     const int enemyLayerMask = 1 << 9;
 
     static Collider[] targetsBuffer = new Collider[100];
 
-    [SerializeField] 
-    Transform turret = default, laserBeam = default;
-    
-    private Vector3 laserBeamScale;
+    public abstract TowerType TowerType { get; }
 
-    [SerializeField, Range(1f, 100f)]
-    float damagePerSecond = 10f;
-
-    private void Awake()
-    {
-        laserBeamScale = laserBeam.localScale;
-    }
-
-    public override void GameUpdate()
-    {
-        if (TrackTarget() || AcquireTarget())
-        {
-            Shoot();
-        }
-        else
-        {
-            laserBeam.localScale = Vector3.zero; // make laser invisible
-        }
-    }
-
-    private void Shoot()
-    {
-        // Turret Rotation
-        Vector3 point = target.Position;
-        turret.LookAt(point);
-        laserBeam.localRotation = turret.localRotation;
-
-        // Laser Scaling
-        float d = Vector3.Distance(turret.position, point);
-        laserBeamScale.z = d;
-        laserBeam.localScale = laserBeamScale;
-        laserBeam.localPosition = turret.localPosition + 0.5f * d * laserBeam.forward;
-
-        // Apply Damage
-        target.Enemy.ApplyDamage(damagePerSecond * Time.deltaTime);
-    }
-
-    private bool AcquireTarget()
+    protected bool AcquireTarget(out TargetPoint target)
     {
         Vector3 a = transform.localPosition;
         Vector3 b = a;
@@ -71,7 +30,7 @@ public class Tower : GameTileContent
         target = null;
         return false;
     }
-    bool TrackTarget()
+    protected bool TrackTarget(ref TargetPoint target)
     {
         if (target == null)
         {
@@ -83,9 +42,10 @@ public class Tower : GameTileContent
         float x = a.x - b.x;
         float z = a.z - b.z;
         float r = targetingRange + 0.125f * target.Enemy.Scale;
+
         // Why did we calculate distance this way -> https://catlikecoding.com/unity/tutorials/tower-defense/towers/#:~:text=How%20does%20that%20math%20work%3F
         if (x * x + z * z > r * r) // Basically, no square root this way
-        {
+        { // if outside of the radius**
             target = null;
             return false;
         }
@@ -100,9 +60,5 @@ public class Tower : GameTileContent
         position.y += 0.01f;
         Gizmos.DrawWireSphere(position, targetingRange);
 
-        if(target != null)
-        {
-            Gizmos.DrawLine(position, target.Position);
-        }
     }
 }

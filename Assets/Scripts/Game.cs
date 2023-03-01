@@ -18,7 +18,9 @@ public class Game : MonoBehaviour
     float spawnProgress;
 
     EnemyCollection enemies = new EnemyCollection();
-    
+
+    private TowerType selectedTowerType;
+
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
     private void OnValidate()
@@ -40,15 +42,10 @@ public class Game : MonoBehaviour
         board.ShowGrid = true;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
+        // Select Tile Action
         if (Input.GetMouseButtonDown(0))
         {
             HandleTouch();
@@ -57,14 +54,25 @@ public class Game : MonoBehaviour
             HandleAlternativeTouch();
         }
 
+        // Display Pathing
         if (Input.GetKeyDown(KeyCode.V))
         {
             board.ShowPaths = !board.ShowPaths;
         }
 
+        // Display Grid
         if (Input.GetKeyDown(KeyCode.G))
         {
             board.ShowGrid = !board.ShowGrid;
+        }
+
+        // Tower Selection
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            selectedTowerType = TowerType.Laser;
+        }else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            selectedTowerType = TowerType.Mortar;
         }
 
         spawnProgress += Time.deltaTime * spawnSpeed;
@@ -110,7 +118,7 @@ public class Game : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                board.ToggleTower(tile);
+                board.ToggleTower(tile, selectedTowerType);
             }
             else
             {
