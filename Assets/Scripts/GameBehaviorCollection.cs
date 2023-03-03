@@ -3,28 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class EnemyCollection
+public class GameBehaviorCollection
 {
-    List<Enemy> enemies = new List<Enemy>();
+    List<GameBehavior> behaviors = new List<GameBehavior>();
 
-    public void Add(Enemy enemy)
+    public void Add(GameBehavior behavior)
     {
-        enemies.Add(enemy);
+        behaviors.Add(behavior);
     }
 
     public void GameUpdate()
     {
-        for(int i = 0; i < enemies.Count; i++)
+        for(int i = 0; i < behaviors.Count; i++)
         {
             // if this enemy fails to update -destroyed/lost/inactive-
-            if (!enemies[i].GameUpdate())
+            if (!behaviors[i].GameUpdate())
             {
                 // move it to the end of the list and remove,
                 // go 1 step back because the enemies[i] has a new entry
                 // and needs to get checked again
-                int lastIndex = enemies.Count - 1;
-                enemies[i] = enemies[lastIndex];
-                enemies.RemoveAt(lastIndex);
+                int lastIndex = behaviors.Count - 1;
+                behaviors[i] = behaviors[lastIndex];
+                behaviors.RemoveAt(lastIndex);
                 i -= 1;
             }
         }

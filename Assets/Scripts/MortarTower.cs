@@ -13,7 +13,7 @@ public class MortarTower : Tower
     [SerializeField]
     Transform mortar = default;
 
-    float launchSpeed;
+    float launchSpeed, launchProgress;
 
     void Awake()
     {
@@ -29,16 +29,26 @@ public class MortarTower : Tower
 
     public override void GameUpdate()
     {
-        Launch(new Vector3(3f, 0f, 0f));
-        Launch(new Vector3(0f, 0f, 1f));
-        Launch(new Vector3(1f, 0f, 1f));
-        Launch(new Vector3(3f, 0f, 1f));
+        launchProgress += Time.deltaTime * shotsPerSecond;
+        while (launchProgress >= 1)
+        {
+            if(AcquireTarget(out TargetPoint target))
+            {
+                Launch(target);
+                launchProgress -= 1f;
+            }
+            else
+            {
+                // Ready to launch
+                launchProgress = 0.999f;
+            }
+        }
     }
 
-    private void Launch(Vector3 offset)
+    private void Launch(TargetPoint target)
     {
         Vector3 launchPoint = mortar.position;
-        Vector3 targetPoint = launchPoint + offset;
+        Vector3 targetPoint = target.Position;
 
         targetPoint.y = 0f;
 
@@ -65,6 +75,13 @@ public class MortarTower : Tower
         float cosTheta = Mathf.Cos(Mathf.Atan(tanTheta));
         float sinTheta = cosTheta * tanTheta;
 
+        mortar.localRotation = Quaternion.LookRotation(new Vector3(dir.x, tanTheta, dir.y));
+
+        Game.SpawnShell().Initialize(
+            launchPoint, targetPoint, 
+            new Vector3(s * cosTheta * dir.x, s * sinTheta, s * cosTheta * dir.y));
+
+
         // Visualize first second of the flight by ten segment lines
         Vector3 prev = launchPoint, next;
         for (int i = 1; i <= 10; i++)
@@ -73,15 +90,15 @@ public class MortarTower : Tower
             float dx = s * cosTheta * t;
             float dy = s * sinTheta * t - 0.5f * g * t * t;
             next = launchPoint + new Vector3(dir.x * dx, dy, dir.y * dx);
-            Debug.DrawLine(prev, next, Color.blue);
+            Debug.DrawLine(prev, next, Color.blue, 1f);
             prev = next;
         }
 
-        Debug.DrawLine(launchPoint, targetPoint, Color.yellow);
+        Debug.DrawLine(launchPoint, targetPoint, Color.yellow, 1f);
         Debug.DrawLine(
             new Vector3(launchPoint.x, 0.01f, launchPoint.z),
             new Vector3(launchPoint.x + dir.x * x, 0.01f, launchPoint.z + dir.y * x), 
-            Color.white
+            Color.white, 1f
             );
 
     }
