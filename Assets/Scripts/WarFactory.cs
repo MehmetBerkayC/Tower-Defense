@@ -7,8 +7,11 @@ using UnityEngine;
 public class WarFactory : GameObjectFactory
 {
     [SerializeField] Shell shellPrefab = default;
+    [SerializeField] Explosion explosionPrefab = default;
 
     public Shell Shell => Get(shellPrefab);
+
+    public Explosion Explosion => Get(explosionPrefab);
 
     T Get<T> (T prefab) where T : WarEntity
     {

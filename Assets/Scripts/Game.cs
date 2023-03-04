@@ -97,6 +97,13 @@ public class Game : MonoBehaviour
         nonEnemies.GameUpdate();
     }
 
+    public static Explosion SpawnExplosion()
+    {
+        Explosion explosion = instance.warFactory.Explosion;
+        instance.nonEnemies.Add(explosion);
+        return explosion;
+    }
+
     public static Shell SpawnShell()
     {
         Shell shell = instance.warFactory.Shell;
