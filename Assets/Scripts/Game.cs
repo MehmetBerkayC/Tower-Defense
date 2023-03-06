@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     GameBoard board = default;
 
     [SerializeField] GameTileContentFactory tileContentFactory = default;
-    [SerializeField] EnemyFactory enemyFactory = default;
+    [SerializeField] EnemyFactory[] enemyFactories = default;
     [SerializeField] WarFactory warFactory = default;
 
     [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f;
@@ -115,7 +115,9 @@ public class Game : MonoBehaviour
     private void SpawnEnemy()
     {
         GameTile spawnPoint = board.GetSpawnPoint(UnityEngine.Random.Range(0, board.SpawnPointCount));
-        Enemy enemy = enemyFactory.Get((EnemyType)(UnityEngine.Random.Range(0, 3)));
+        Enemy enemy = 
+            enemyFactories[UnityEngine.Random.Range(0,enemyFactories.Length)]
+            .Get((EnemyType)(UnityEngine.Random.Range(0, 3)));
         enemy.SpawnOn(spawnPoint);
         enemies.Add(enemy);
     }
