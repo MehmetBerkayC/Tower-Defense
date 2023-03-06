@@ -115,7 +115,7 @@ public class Game : MonoBehaviour
     private void SpawnEnemy()
     {
         GameTile spawnPoint = board.GetSpawnPoint(UnityEngine.Random.Range(0, board.SpawnPointCount));
-        Enemy enemy = enemyFactory.Get();
+        Enemy enemy = enemyFactory.Get((EnemyType)(UnityEngine.Random.Range(0, 3)));
         enemy.SpawnOn(spawnPoint);
         enemies.Add(enemy);
     }
