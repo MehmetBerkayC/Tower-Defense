@@ -6,9 +6,7 @@ public class Shell : WarEntity
 {
     Vector3 launchPoint, targetPoint, launchVelocity;
 
-    float damage, blastRadius;
-
-    float age;
+    float age, damage, blastRadius;
 
     public void Initialize(
         Vector3 launchPoint, Vector3 targetPoint, 
@@ -17,8 +15,8 @@ public class Shell : WarEntity
         this.launchPoint = launchPoint;
         this.targetPoint = targetPoint;
         this.launchVelocity = launchVelocity;
-        this.damage = damage;
         this.blastRadius = blastRadius;
+        this.damage = damage;
     }
 
     public override bool GameUpdate()
@@ -27,8 +25,8 @@ public class Shell : WarEntity
         age += Time.deltaTime;
         Vector3 p = launchPoint + launchVelocity * age;
         p.y -= 0.5f * 9.81f * age * age;
-        
-        if(p.y <= 0f)
+
+        if (p.y <= 0f)
         {
             Game.SpawnExplosion().Initialize(targetPoint, blastRadius, damage);
 
@@ -38,12 +36,13 @@ public class Shell : WarEntity
 
         transform.localPosition = p;
 
-
-
         // Rotate Shell
         Vector3 d = launchVelocity;
         d.y -= 9.81f * age;
         transform.localRotation = Quaternion.LookRotation(d);
+
+        // Trace
+        Game.SpawnExplosion().Initialize(p, 0.1f, 0f); 
         return true;
     }
 }

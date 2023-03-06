@@ -5,19 +5,21 @@ using UnityEngine;
 
 public class MortarTower : Tower
 {
-    public override TowerType TowerType => TowerType.Mortar;
 
-    [SerializeField, Range(0.5f, 2f)]
+    [SerializeField, Range(0.5f, 2f)] 
     float shotsPerSecond = 1f;
-
+    
+    [SerializeField, Range(0.5f, 3f)] 
+    float shellBlastRadius = 1f;
+    
+    [SerializeField, Range(1f, 100f)]
+    float shellDamage = 10f;
+    
     [SerializeField]
     Transform mortar = default;
+    public override TowerType TowerType => TowerType.Mortar;
 
     float launchSpeed, launchProgress;
-
-    [SerializeField, Range(0.5f, 3f)] float shellBlastRadius = 1f;
-    [SerializeField, Range(1f, 100f)] float shellDamage = 10f;
-
 
     void Awake()
     {
@@ -34,7 +36,7 @@ public class MortarTower : Tower
     public override void GameUpdate()
     {
         launchProgress += Time.deltaTime * shotsPerSecond;
-        while (launchProgress >= 1)
+        while (launchProgress >= 1F)
         {
             if(AcquireTarget(out TargetPoint target))
             {
@@ -65,7 +67,7 @@ public class MortarTower : Tower
         dir /= x; // Normalizing
 
         // Magic -> https://catlikecoding.com/unity/tutorials/tower-defense/ballistics/#:~:text=types%2C%20one%20inactive-,Calculating%20Trajectories,-A%20mortar%20works
-        // tan() = ( s^2 + root( s^4 - g(gx^2 + 2ys^2) ) ) / gx 
+        // tan() = ( s^2 + sqrroot( s^4 - g(gx^2 + 2ys^2) ) ) / gx 
        
         float g = 9.81f; // Gravity
         float s = launchSpeed; 
@@ -108,4 +110,6 @@ public class MortarTower : Tower
         //    );
 
     }
+
+
 }

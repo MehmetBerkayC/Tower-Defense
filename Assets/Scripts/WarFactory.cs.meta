@@ -3,7 +3,9 @@ guid: 177145e1c7c1fd348a0a433a3ad92ac3
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - shellPrefab: {instanceID: 0}
+  - explosionPrefab: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

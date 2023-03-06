@@ -8,6 +8,7 @@ public class GameTile : MonoBehaviour
     Transform arrow = default;
 
     GameTile north, east, south, west, nextOnPath;
+
     int distance;
 
     public Direction PathDirection { get; private set; }

@@ -27,19 +27,6 @@ public class Game : MonoBehaviour
     
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
-    private void OnValidate()
-    {
-        // At the least 2x2 board is available
-        if(boardSize.x < 2)
-        {
-            boardSize.x = 2;
-        }    
-        if(boardSize.y < 2)
-        {
-            boardSize.y = 2;
-        }
-    }
-
     private void OnEnable()
     {
         instance = this;    
@@ -49,6 +36,19 @@ public class Game : MonoBehaviour
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
+    }
+
+    private void OnValidate()
+    {
+        // At the least 2x2 board is available
+        if (boardSize.x < 2)
+        {
+            boardSize.x = 2;
+        }
+        if (boardSize.y < 2)
+        {
+            boardSize.y = 2;
+        }
     }
 
     // Update is called once per frame
@@ -79,7 +79,8 @@ public class Game : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             selectedTowerType = TowerType.Laser;
-        }else if (Input.GetKeyDown(KeyCode.Alpha2))
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             selectedTowerType = TowerType.Mortar;
         }

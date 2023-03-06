@@ -11,16 +11,16 @@ public class GameBoard : MonoBehaviour
     [SerializeField] 
     GameTile tilePrefab = default;
 
+    [SerializeField]
+    Texture2D gridTexture = default;
+
     Vector2Int size;
 
     GameTile[] tiles;
 
-    Queue<GameTile> searchFrontier = new Queue<GameTile>();
-
     GameTileContentFactory contentFactory;
 
-    [SerializeField] 
-    Texture2D gridTexture = default;
+    Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
     List<GameTile> spawnPoints = new List<GameTile>();
 
@@ -69,14 +69,8 @@ public class GameBoard : MonoBehaviour
         }
     }
 
-    public void GameUpdate()
-    {
-        for(int i = 0; i < updatingContent.Count; i++)
-        {
-            updatingContent[i].GameUpdate();
-        }
-    }
-
+    public int SpawnPointCount => spawnPoints.Count;
+ 
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
         this.size = size;
@@ -128,6 +122,13 @@ public class GameBoard : MonoBehaviour
 
         // Make a spawn point for a valid board
         ToggleSpawnPoint(tiles[0]);
+    }
+    public void GameUpdate()
+    {
+        for (int i = 0; i < updatingContent.Count; i++)
+        {
+            updatingContent[i].GameUpdate();
+        }
     }
 
     public void ToggleDestination(GameTile tile)
@@ -289,11 +290,9 @@ public class GameBoard : MonoBehaviour
             }
         }
       
-
         return true;
     }
 
-    public int SpawnPointCount => spawnPoints.Count;
 
     public GameTile GetSpawnPoint (int index)
     {

@@ -4,23 +4,41 @@ using UnityEngine;
 
 public class Explosion : WarEntity
 {
+    static int colorPropertyID = Shader.PropertyToID("_Color");
+    static MaterialPropertyBlock propertyBlock;
+
+    [SerializeField] AnimationCurve opacityCurve = default;
+    [SerializeField] AnimationCurve scaleCurve = default;
+    
     [SerializeField, Range(0f, 1f)]
     float duration = 0.5f;
 
     float age;
 
-    [SerializeField] AnimationCurve opacityCurve = default;
-    [SerializeField] AnimationCurve scaleCurve = default;
+    float scale;
 
-    public void Initialize(Vector3 position, float blastRadius, float damage)
+    MeshRenderer meshRenderer;
+
+    private void Awake()
     {
-        TargetPoint.FillBuffer(position, blastRadius);
-        for (int i = 0; i < TargetPoint.BufferedCount; i++)
+        meshRenderer = GetComponent<MeshRenderer>();
+        Debug.Assert(meshRenderer != null, "Explosion without renderer!");
+    }
+
+    public void Initialize(Vector3 position, float blastRadius, float damage = 0f)
+    {
+        if(damage > 0f)
         {
-            TargetPoint.GetBuffered(i).Enemy.ApplyDamage(damage);
+            TargetPoint.FillBuffer(position, blastRadius);
+            for (int i = 0; i < TargetPoint.BufferedCount; i++)
+            {
+                TargetPoint.GetBuffered(i).Enemy.ApplyDamage(damage);
+            }
         }
+        
         transform.localPosition = position;
-        transform.localScale = Vector3.one * (2f * blastRadius);
+
+        scale = 2f * blastRadius;
     }
 
     public override bool GameUpdate()
@@ -31,6 +49,20 @@ public class Explosion : WarEntity
             OriginFactory.Reclaim(this);
             return false;
         }
+
+        if(propertyBlock == null)
+        {
+            propertyBlock = new MaterialPropertyBlock();
+        }
+        float t = age / duration;
+        Color c = Color.clear;
+
+        c.a = opacityCurve.Evaluate(t);
+        propertyBlock.SetColor(colorPropertyID, c);
+        meshRenderer.SetPropertyBlock(propertyBlock);
+        
+        transform.localScale = Vector3.one * (scale * scaleCurve.Evaluate(t));
+
         return true;
     }
 }
