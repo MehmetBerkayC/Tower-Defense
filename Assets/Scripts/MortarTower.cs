@@ -21,36 +21,28 @@ public class MortarTower : Tower
 
     float launchSpeed, launchProgress;
 
-    void Awake()
-    {
-        OnValidate();
-    }
+	void Awake () {
+		OnValidate();
+	}
 
-    void OnValidate()
-    {
-        float x = targetingRange + 0.25001f;
-        float y = -mortar.position.y;
-        launchSpeed = Mathf.Sqrt(9.81f * (y + Mathf.Sqrt(x * x + y * y)));
-    }
+	void OnValidate () {
+		float x = targetingRange + 0.25001f;
+		float y = -mortar.position.y;
+		launchSpeed = Mathf.Sqrt(9.81f * (y + Mathf.Sqrt(x * x + y * y)));
+	}
 
-    public override void GameUpdate()
-    {
-        launchProgress += Time.deltaTime * shotsPerSecond;
-        while (launchProgress >= 1F)
-        {
-            if(AcquireTarget(out TargetPoint target))
-            {
-                Launch(target);
-                launchProgress -= 1f;
-            }
-            else
-            {
-                // Ready to launch
-                launchProgress = 0.999f;
-            }
-        }
-    }
-
+	public override void GameUpdate () {
+		launchProgress += shotsPerSecond * Time.deltaTime;
+		while (launchProgress >= 1f) {
+			if (AcquireTarget(out TargetPoint target)) {
+				Launch(target);
+				launchProgress -= 1f;
+			}
+			else {
+				launchProgress = 0.999f;
+			}
+		}
+	}
     private void Launch(TargetPoint target)
     {
         Vector3 launchPoint = mortar.position;
@@ -76,6 +68,11 @@ public class MortarTower : Tower
         float r = s2 * s2 - g * (g * x * x + 2f * y * s2);
         
         Debug.Assert(r >= 0f, "Launch velocity insufficient for range!");
+        
+        if(r < 0f) // DO NOT CHANGE UNDER ANY CIRCUMSTANCE!
+        {
+            return;
+        }
 
         float tanTheta = (s2 + Mathf.Sqrt(r)) / (g * x);
         float cosTheta = Mathf.Cos(Mathf.Atan(tanTheta));
@@ -105,7 +102,7 @@ public class MortarTower : Tower
         //Debug.DrawLine(launchPoint, targetPoint, Color.yellow, 1f);
         //Debug.DrawLine(
         //    new Vector3(launchPoint.x, 0.01f, launchPoint.z),
-        //    new Vector3(launchPoint.x + dir.x * x, 0.01f, launchPoint.z + dir.y * x), 
+        //    new Vector3(launchPoint.x + dir.x * x, 0.01f, launchPoint.z + dir.y * x),
         //    Color.white, 1f
         //    );
 
