@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce09a7200decc0d48b719b53b3bb14a5, type: 3}
+  m_Name: Wave 2 - Spheres
+  m_EditorClassIdentifier: 
+  spawnSequences:
+  - factories:
+    - {fileID: 11400000, guid: 2845558bc62814a45a19a4aea2f46f49, type: 2}
+    type: 1
+    amount: 10
+    cooldown: 1
+  - factories:
+    - {fileID: 11400000, guid: 2845558bc62814a45a19a4aea2f46f49, type: 2}
+    type: 2
+    amount: 5
+    cooldown: 2
+  - factories:
+    - {fileID: 11400000, guid: 2845558bc62814a45a19a4aea2f46f49, type: 2}
+    type: 0
+    amount: 7
+    cooldown: 3
