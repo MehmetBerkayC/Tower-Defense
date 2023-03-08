@@ -110,12 +110,23 @@ public class GameBoard : MonoBehaviour
                 {
                     // revert changes
                     tile.IsAlternative = !tile.IsAlternative;
-                } // This will make a checkerboard design
-
-                // Assign every tile as empty
-                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                } // This will make a checkerboard design in pathing
             }
         }
+
+        Clear();
+    }
+
+    public void Clear()
+    {
+        foreach (GameTile tile in tiles)
+        {             
+            // Assign every tile as empty
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+        }
+
+        spawnPoints.Clear();
+        updatingContent.Clear();
 
         // Make an exit for a valid board
         ToggleDestination(tiles[tiles.Length / 2]);

@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    [SerializeField, Range(0,100)]
+    int startingPlayerHealth = 10;
+
+    int playerHealth;
+
     [SerializeField]
     Vector2Int boardSize = new Vector2Int(11, 11);
 
@@ -33,6 +38,7 @@ public class Game : MonoBehaviour
 
     private void Awake()
     {
+        playerHealth = startingPlayerHealth;
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
         activeScenario = scenario.Begin();
@@ -85,12 +91,44 @@ public class Game : MonoBehaviour
             selectedTowerType = TowerType.Mortar;
         }
 
-        activeScenario.Progress();
+        // New Game
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            BeginNewGame();
+        }
+
+        if(playerHealth <= 0 && startingPlayerHealth > 0)
+        {
+            Debug.Log("Defeat!");
+            BeginNewGame();
+        }
+
+
+        if (!activeScenario.Progress() && enemies.IsEmpty) // returns false if scenarios complete
+        {
+            Debug.Log("Victory!");
+            BeginNewGame();
+            activeScenario.Progress();
+        }
 
         enemies.GameUpdate();
         Physics.SyncTransforms();
         board.GameUpdate();
         nonEnemies.GameUpdate();
+    }
+
+    private void BeginNewGame()
+    {
+        playerHealth = startingPlayerHealth;
+        enemies.Clear();
+        nonEnemies.Clear();
+        board.Clear();
+        activeScenario = scenario.Begin();
+    }
+
+    public static void EnemyReachedDestination()
+    {
+        instance.playerHealth -= 1;
     }
 
     public static Explosion SpawnExplosion()

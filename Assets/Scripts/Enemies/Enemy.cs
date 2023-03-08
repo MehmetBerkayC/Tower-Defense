@@ -60,16 +60,17 @@ public class Enemy : GameBehavior
     {
         if(Health <= 0f)
         {
-            originFactory.Reclaim(this);
+            Recycle();
             return false;
         }
 
         progress += Time.deltaTime * progressFactor;
         while (progress >= 1)
         {
-            if (tileTo == null)
+            if (tileTo == null) // in destination - nowhere to go
             {
-                originFactory.Reclaim(this);
+                Game.EnemyReachedDestination();
+                Recycle();
                 return false;
             }
 
@@ -88,6 +89,11 @@ public class Enemy : GameBehavior
             transform.localRotation = Quaternion.Euler(0f, angle, 0f);
         }
         return true;
+    }
+
+    public override void Recycle()
+    {
+        OriginFactory.Reclaim(this);
     }
 
     public void ApplyDamage(float damage)
