@@ -27,9 +27,32 @@ public class EnemySpawnSequence
     {
         EnemySpawnSequence sequence;
 
+        int count;
+        float cooldown;
+
+        // Constructor
         public State(EnemySpawnSequence sequence)
         {
             this.sequence = sequence;
+            count = 0;
+            cooldown = sequence.cooldown;
         }
+
+        public float Progress(float deltaTime)
+        {
+            cooldown += deltaTime;
+            while(cooldown >= sequence.cooldown)
+            {
+                cooldown -= sequence.cooldown;
+                if(count >= sequence.amount)
+                {
+                    return cooldown;
+                }
+                count += 1;
+                Game.SpawnEnemy(sequence.factories, sequence.type);
+            }
+            return -1f;
+        }
+
     }
 }

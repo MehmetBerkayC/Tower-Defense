@@ -12,16 +12,15 @@ public class Game : MonoBehaviour
     GameBoard board = default;
 
     [SerializeField] GameTileContentFactory tileContentFactory = default;
-    [SerializeField] EnemyFactory[] enemyFactories = default;
     [SerializeField] WarFactory warFactory = default;
-
-    [SerializeField, Range(0.1f, 10f)] float spawnSpeed = 1f;
-    float spawnProgress;
 
     GameBehaviorCollection enemies = new GameBehaviorCollection();
     GameBehaviorCollection nonEnemies = new GameBehaviorCollection();
 
     private TowerType selectedTowerType;
+
+    [SerializeField] GameScenario scenario = default;
+    GameScenario.State activeScenario;
 
     static Game instance;
     
@@ -36,6 +35,7 @@ public class Game : MonoBehaviour
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
+        activeScenario = scenario.Begin();
     }
 
     private void OnValidate()
@@ -85,12 +85,7 @@ public class Game : MonoBehaviour
             selectedTowerType = TowerType.Mortar;
         }
 
-        spawnProgress += Time.deltaTime * spawnSpeed;
-        while (spawnProgress >= 1f)
-        {
-            spawnProgress -= 1;
-            SpawnEnemy();
-        }
+        activeScenario.Progress();
 
         enemies.GameUpdate();
         Physics.SyncTransforms();
@@ -112,14 +107,13 @@ public class Game : MonoBehaviour
         return shell;
     }
 
-    private void SpawnEnemy()
+    public static void SpawnEnemy(EnemyFactory[] factories, EnemyType type)
     {
-        GameTile spawnPoint = board.GetSpawnPoint(UnityEngine.Random.Range(0, board.SpawnPointCount));
-        Enemy enemy = 
-            enemyFactories[UnityEngine.Random.Range(0,enemyFactories.Length)]
-            .Get((EnemyType)(UnityEngine.Random.Range(0, 3)));
+        GameTile spawnPoint = instance.board.GetSpawnPoint(UnityEngine.Random.Range(0, instance.board.SpawnPointCount));
+        Enemy enemy = factories[UnityEngine.Random.Range(0, factories.Length)].Get(type);
+            
         enemy.SpawnOn(spawnPoint);
-        enemies.Add(enemy);
+        instance.enemies.Add(enemy);
     }
 
     private void HandleAlternativeTouch()
