@@ -27,6 +27,11 @@ public class Game : MonoBehaviour
     [SerializeField] GameScenario scenario = default;
     GameScenario.State activeScenario;
 
+    [SerializeField, Range(1f, 10f)]
+    float playSpeed = 1f;
+
+    const float pausedTimeScale = 0f;
+
     static Game instance;
     
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -91,6 +96,16 @@ public class Game : MonoBehaviour
             selectedTowerType = TowerType.Mortar;
         }
 
+        // Pause Game
+        if (Input.GetKeyDown(KeyCode.Space))
+        { 
+            // if already paused continue, else pause
+            Time.timeScale = Time.timeScale > pausedTimeScale ? pausedTimeScale : playSpeed;
+        }else if(Time.timeScale > pausedTimeScale)
+        {
+            Time.timeScale = playSpeed;
+        }
+
         // New Game
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -102,7 +117,6 @@ public class Game : MonoBehaviour
             Debug.Log("Defeat!");
             BeginNewGame();
         }
-
 
         if (!activeScenario.Progress() && enemies.IsEmpty) // returns false if scenarios complete
         {
