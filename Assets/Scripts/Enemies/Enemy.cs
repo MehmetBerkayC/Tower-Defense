@@ -21,6 +21,11 @@ public class Enemy : GameBehavior
     float pathOffset;
     float speed;
 
+    [SerializeField]
+    EnemyAnimationConfig animationConfig = default;
+
+    EnemyAnimator animator;
+
     float Health { get; set; }
 
     public float Scale { get; private set; }
@@ -35,6 +40,13 @@ public class Enemy : GameBehavior
         }
     }
 
+    private void Awake()
+    {
+        animator.Configure(
+            model.GetChild(0).gameObject.AddComponent<Animator>(), 
+            animationConfig);    
+    }
+
     public void Initialize(float scale, float speed, float pathOffset, float health)
     {
         Scale = scale;
@@ -42,6 +54,8 @@ public class Enemy : GameBehavior
         this.speed = speed;
         this.pathOffset = pathOffset;
         Health = health;
+
+        animator.Play();
     }
 
     public void SpawnOn(GameTile tile)
@@ -53,8 +67,6 @@ public class Enemy : GameBehavior
         progress = 0f;
         PrepareIntro();
     }
-
- 
 
     public override bool GameUpdate()
     {
@@ -93,6 +105,7 @@ public class Enemy : GameBehavior
 
     public override void Recycle()
     {
+        animator.Stop();
         OriginFactory.Reclaim(this);
     }
 
