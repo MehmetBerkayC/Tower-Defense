@@ -26,6 +26,19 @@ public class Enemy : GameBehavior
 
     EnemyAnimator animator;
 
+    Collider targetPointCollider;
+
+    public Collider TargetPointCollider
+    {
+        set
+        {
+            Debug.Assert(targetPointCollider == null, "Redefined collider!");
+            targetPointCollider = value;
+        }
+    }
+
+    public bool IsValidTarget => animator.CurrentClip == EnemyAnimator.Clip.Move;
+
     float Health { get; set; }
 
     public float Scale { get; private set; }
@@ -44,7 +57,10 @@ public class Enemy : GameBehavior
     {
         animator.Configure(
             model.GetChild(0).gameObject.AddComponent<Animator>(), 
-            animationConfig);    
+            animationConfig);
+
+        targetPointCollider.enabled = false; // Will disable collider if immobile
+
     }
 
     public void Initialize(float scale, float speed, float pathOffset, float health)
@@ -55,7 +71,12 @@ public class Enemy : GameBehavior
         this.pathOffset = pathOffset;
         Health = health;
 
-        animator.Play();
+        animator.PlayIntro();
+    }
+
+    private void OnDestroy()
+    {
+        animator.Destroy();    
     }
 
     public void SpawnOn(GameTile tile)
@@ -70,10 +91,31 @@ public class Enemy : GameBehavior
 
     public override bool GameUpdate()
     {
+        animator.GameUpdate();
+        if(animator.CurrentClip == EnemyAnimator.Clip.Intro)
+        {
+            if (!animator.IsDone)
+            {
+                return true; 
+            }
+            animator.PlayMove(speed / Scale);
+            targetPointCollider.enabled = true;
+        }
+        else if(animator.CurrentClip >= EnemyAnimator.Clip.Outro) // outro or dying
+        {
+            if (animator.IsDone)
+            {
+                Recycle();
+                return false;
+            }
+            return true;
+        }
+
         if(Health <= 0f)
         {
-            Recycle();
-            return false;
+            animator.PlayDying();
+            targetPointCollider.enabled = false;
+            return true;
         }
 
         progress += Time.deltaTime * progressFactor;
@@ -82,8 +124,8 @@ public class Enemy : GameBehavior
             if (tileTo == null) // in destination - nowhere to go
             {
                 Game.EnemyReachedDestination();
-                Recycle();
-                return false;
+                animator.PlayOutro();
+                return true;
             }
 
             progress = (progress - 1f) / progressFactor;
@@ -194,6 +236,7 @@ public class Enemy : GameBehavior
     private void PrepareIntro()
     {
         positionFrom = tileFrom.transform.localPosition;
+        transform.localPosition = positionFrom; // For the animations
         positionTo = tileFrom.ExitPoint; // The edge we exit the tile
 
         direction = tileFrom.PathDirection;
